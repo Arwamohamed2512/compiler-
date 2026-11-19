@@ -712,6 +712,34 @@
             font-size: 0.9rem;
         }
 
+        .backbone-badge {
+            display: inline-block;
+            background: rgba(192, 132, 252, 0.12);
+            color: var(--accent-pink);
+            border: 1px solid rgba(192, 132, 252, 0.35);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+
+        pre.func-backbone {
+            background-color: #03050a;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 0.88rem;
+            color: #38bdf8;
+            margin-top: 4px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
         /* Footer */
         footer.footer-wide {
             width: 100%;
@@ -947,41 +975,120 @@ EOF()@4:1</pre>
         <table class="func-table-wide">
             <thead>
                 <tr>
-                    <th style="width: 20%;">Function</th>
-                    <th style="width: 25%;">Input & Output</th>
-                    <th>Responsibility & Implementation Details</th>
+                    <th style="width: 18%;">Function</th>
+                    <th style="width: 22%;">Input & Output</th>
+                    <th>Responsibility & Code Backbone</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="name-col">current()</td>
                     <td class="type-col">Input: None<br>Output: char</td>
-                    <td>Returns the character at index <code>pos</code>, or <code>'\0'</code> if the end of source string has been reached.</td>
+                    <td>
+                        Returns the character at index <code>pos</code>, or <code>'\0'</code> if the end of source string has been reached.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private char current() {
+    if (pos &gt;= source.length()) return '\0';
+    return source.charAt(pos);
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">peek()</td>
                     <td class="type-col">Input: None<br>Output: char</td>
-                    <td>Looks ahead at character <code>pos + 1</code> without advancing the scanner pointer.</td>
+                    <td>
+                        Looks ahead at character <code>pos + 1</code> without advancing the scanner pointer.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private char peek() {
+    if (pos + 1 &gt;= source.length()) return '\0';
+    return source.charAt(pos + 1);
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">advance()</td>
                     <td class="type-col">Input: None<br>Output: void</td>
-                    <td>Consumes one character. On <code>\n</code>, increments <code>line</code> and resets <code>column = 1</code>; otherwise increments <code>column</code>.</td>
+                    <td>
+                        Consumes one character. On <code>\n</code>, increments <code>line</code> and resets <code>column = 1</code>; otherwise increments <code>column</code>.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private void advance() {
+    if (current() == '\0') return;
+    if (current() == '\n') {
+        line++;
+        column = 1;
+    } else {
+        column++;
+    }
+    pos++;
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">add(type, text, atLine, atCol)</td>
                     <td class="type-col">Input: TokenType, String, int, int<br>Output: void</td>
-                    <td>Creates a new immutable <code>Token</code> instance with source coordinates and appends it to the internal <code>tokens</code> list.</td>
+                    <td>
+                        Creates a new immutable <code>Token</code> instance with source coordinates and appends it to the internal <code>tokens</code> list.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private void add(TokenType type, String text, int atLine, int atColumn) {
+    tokens.add(new Token(type, text, atLine, atColumn));
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">error(message, atLine, atCol)</td>
                     <td class="type-col">Input: String, int, int<br>Output: throws RuntimeException</td>
-                    <td>Aborts lexical scanning, throwing a detailed diagnostic error indicating the offending character and its line/column numbers.</td>
+                    <td>
+                        Aborts lexical scanning, throwing a detailed diagnostic error indicating the offending character and its line/column numbers.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private void error(String message, int atLine, int atColumn) {
+    throw new RuntimeException("Lexical Error at line " + atLine +
+            ", column " + atColumn + ": " + message);
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">scan()</td>
                     <td class="type-col">Input: None<br>Output: List&lt;Token&gt;</td>
-                    <td>Main lexical loop. Iterates character-by-character, delegates keyword vs identifier detection, adds symbols, appends final <code>EOF</code>, and returns tokens.</td>
+                    <td>
+                        Main lexical loop. Iterates character-by-character, delegates keyword vs identifier detection, adds symbols, appends final <code>EOF</code>, and returns tokens.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>List&lt;Token&gt; scan() {
+    while (current() != '\0') {
+        char c = current();
+        int tokenLine = line, tokenColumn = column;
+        if (c == ' ' || c == '\t' || c == '\r') { advance(); continue; }
+        if (c == '\n') { add(TokenType.NEWLINE, "\n", tokenLine, tokenColumn); advance(); continue; }
+        if (Character.isDigit(c)) {
+            int start = pos;
+            while (Character.isDigit(current())) advance();
+            add(TokenType.Number, source.substring(start, pos), tokenLine, tokenColumn);
+            continue;
+        }
+        if (Character.isLetter(c) || c == '_') {
+            int start = pos;
+            while (Character.isLetterOrDigit(current()) || current() == '_') advance();
+            String word = source.substring(start, pos);
+            TokenType type = switch (word) {
+                case "let" -&gt; TokenType.let; case "print" -&gt; TokenType.print;
+                case "if" -&gt; TokenType.IF;   case "else" -&gt; TokenType.Else;
+                case "while" -&gt; TokenType.While; case "end" -&gt; TokenType.End;
+                default -&gt; TokenType.Var;
+            };
+            add(type, word, tokenLine, tokenColumn);
+            continue;
+        }
+        switch (c) {
+            case '=' -&gt; { advance(); add(TokenType.EQUALS, "=", tokenLine, tokenColumn); }
+            case '+' -&gt; { advance(); add(TokenType.PLUS, "+", tokenLine, tokenColumn); }
+            case '-' -&gt; { advance(); add(TokenType.MINUS, "-", tokenLine, tokenColumn); }
+            case '*' -&gt; { advance(); add(TokenType.STAR, "*", tokenLine, tokenColumn); }
+            default -&gt; error("Unexpected character '" + c + "'", tokenLine, tokenColumn);
+        }
+    }
+    add(TokenType.EOF, "", line, column);
+    return tokens;
+}</code></pre>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -1043,51 +1150,181 @@ EOF()@4:1</pre>
         <table class="func-table-wide">
             <thead>
                 <tr>
-                    <th style="width: 20%;">Function</th>
-                    <th style="width: 25%;">Input & Output</th>
-                    <th>Responsibility & Implementation Details</th>
+                    <th style="width: 18%;">Function</th>
+                    <th style="width: 22%;">Input & Output</th>
+                    <th>Responsibility & Code Backbone</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="name-col">parseProgram()</td>
                     <td class="type-col">Input: None<br>Output: List&lt;Stmt&gt;</td>
-                    <td>Top-level entry point. Repeatedly skips newlines and parses top-level statements until reaching the <code>EOF</code> token.</td>
+                    <td>
+                        Top-level entry point. Repeatedly skips newlines and parses top-level statements until reaching the <code>EOF</code> token.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>List&lt;Stmt&gt; parseProgram() {
+    List&lt;Stmt&gt; program = new ArrayList&lt;&gt;();
+    while (true) {
+        while (match(lexer.TokenType.NEWLINE)) { }
+        if (current().type == lexer.TokenType.EOF) break;
+        program.add(parseStatement());
+    }
+    return program;
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">parseStatement()</td>
                     <td class="type-col">Input: None<br>Output: Stmt</td>
-                    <td>Inspects current token: branches to <code>let</code>, <code>print</code>, <code>if</code>, <code>while</code>, or variable assignment.</td>
+                    <td>
+                        Inspects current token: branches to <code>let</code>, <code>print</code>, <code>if</code>, <code>while</code>, or variable assignment.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private Stmt parseStatement() {
+    lexer.Token t = current();
+    switch (t.type) {
+        case let:
+            pos++;
+            lexer.Token name = consume(lexer.TokenType.Var, "Expected variable name after 'let'");
+            consume(lexer.TokenType.EQUALS, "Expected '=' in let statement");
+            return Stmt.let(name.text, parseExpression());
+        case print:
+            pos++;
+            return Stmt.print(parseExpression());
+        case IF:
+            pos++;
+            Expr cond = parseCondition();
+            List&lt;Stmt&gt; thenBody = parseBlock(true);
+            List&lt;Stmt&gt; elseBody = match(lexer.TokenType.Else) ? parseBlock(false) : null;
+            consume(lexer.TokenType.End, "Expected 'end' after if statement");
+            return Stmt.ifStmt(cond, thenBody, elseBody);
+        case While:
+            pos++;
+            Expr cond = parseCondition();
+            List&lt;Stmt&gt; body = parseBlock(false);
+            consume(lexer.TokenType.End, "Expected 'end' after while statement");
+            return Stmt.whileStmt(cond, body);
+        case Var:
+            pos++;
+            consume(lexer.TokenType.EQUALS, "Expected '=' in assignment");
+            return Stmt.assign(t.text, parseExpression());
+        default:
+            error("Unexpected token at start of statement");
+            return null;
+    }
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">parseBlock(stopAtElse)</td>
                     <td class="type-col">Input: boolean<br>Output: List&lt;Stmt&gt;</td>
-                    <td>Parses a sequence of statements inside block bodies until reaching <code>end</code>, <code>else</code> (if <code>stopAtElse</code> is true), or <code>EOF</code>.</td>
+                    <td>
+                        Parses a sequence of statements inside block bodies until reaching <code>end</code>, <code>else</code> (if <code>stopAtElse</code> is true), or <code>EOF</code>.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private List&lt;Stmt&gt; parseBlock(boolean stopAtElse) {
+    List&lt;Stmt&gt; stmts = new ArrayList&lt;&gt;();
+    while (true) {
+        while (match(lexer.TokenType.NEWLINE)) { }
+        lexer.TokenType t = current().type;
+        if (t == lexer.TokenType.EOF || t == lexer.TokenType.End
+                || (stopAtElse &amp;&amp; t == lexer.TokenType.Else)) {
+            break;
+        }
+        stmts.add(parseStatement());
+    }
+    return stmts;
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">parseCondition()</td>
                     <td class="type-col">Input: None<br>Output: Expr</td>
-                    <td>Parses conditional expressions: parses left expression, checks for <code>=</code>, and parses right expression.</td>
+                    <td>
+                        Parses conditional expressions: parses left expression, checks for <code>=</code>, and parses right expression.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private Expr parseCondition() {
+    Expr left = parseExpression();
+    if (current().type == lexer.TokenType.EQUALS) {
+        String op = current().text;
+        pos++;
+        return Expr.binary(op, left, parseExpression());
+    }
+    return left;
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">parseExpression()</td>
                     <td class="type-col">Input: None<br>Output: Expr</td>
-                    <td>Parses addition (<code>+</code>) and subtraction (<code>-</code>) using a left-associative <code>while</code> loop.</td>
+                    <td>
+                        Parses addition (<code>+</code>) and subtraction (<code>-</code>) using a left-associative <code>while</code> loop.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private Expr parseExpression() {
+    Expr left = parseTerm();
+    while (current().type == lexer.TokenType.PLUS
+            || current().type == lexer.TokenType.MINUS) {
+        String op = current().text;
+        pos++;
+        left = Expr.binary(op, left, parseTerm());
+    }
+    return left;
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">parseTerm()</td>
                     <td class="type-col">Input: None<br>Output: Expr</td>
-                    <td>Parses multiplication (<code>*</code>) and division (<code>/</code>), binding tighter than addition and subtraction.</td>
+                    <td>
+                        Parses multiplication (<code>*</code>) and division (<code>/</code>), binding tighter than addition and subtraction.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private Expr parseTerm() {
+    Expr left = parseFactor();
+    while (current().type == lexer.TokenType.STAR
+            || current().type == lexer.TokenType.SLASH) {
+        String op = current().text;
+        pos++;
+        left = Expr.binary(op, left, parseFactor());
+    }
+    return left;
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">parseFactor()</td>
                     <td class="type-col">Input: None<br>Output: Expr</td>
-                    <td>Consumes atomic leaf tokens: either a numeric constant (<code>Number</code>) or a variable name (<code>Var</code>).</td>
+                    <td>
+                        Consumes atomic leaf tokens: either a numeric constant (<code>Number</code>) or a variable name (<code>Var</code>).
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private Expr parseFactor() {
+    lexer.Token t = current();
+    switch (t.type) {
+        case Number:
+            pos++;
+            return Expr.number(t.text);
+        case Var:
+            pos++;
+            return Expr.name(t.text);
+        default:
+            error("Expected number or variable");
+            return null;
+    }
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">consume(type, message)</td>
                     <td class="type-col">Input: TokenType, String<br>Output: Token</td>
-                    <td>Asserts current token matches <code>type</code> and advances; throws a syntax error if there is a mismatch.</td>
+                    <td>
+                        Asserts current token matches <code>type</code> and advances; throws a syntax error if there is a mismatch.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private lexer.Token consume(lexer.TokenType type, String message) {
+    lexer.Token t = current();
+    if (t.type != type) {
+        error(message);
+    }
+    pos++;
+    return t;
+}</code></pre>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -1165,33 +1402,93 @@ let a = 20
         <table class="func-table-wide">
             <thead>
                 <tr>
-                    <th style="width: 20%;">Function</th>
-                    <th style="width: 25%;">Input & Output</th>
-                    <th>Responsibility & Implementation Details</th>
+                    <th style="width: 18%;">Function</th>
+                    <th style="width: 22%;">Input & Output</th>
+                    <th>Responsibility & Code Backbone</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="name-col">analyze(program)</td>
                     <td class="type-col">Input: List&lt;Stmt&gt;<br>Output: void</td>
-                    <td>Clears the internal <code>declared</code> set and initiates top-to-bottom checking of all program statements.</td>
+                    <td>
+                        Clears the internal <code>declared</code> set and initiates top-to-bottom checking of all program statements.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>void analyze(List&lt;parser.Stmt&gt; program) {
+    declared.clear();
+    checkStatements(program);
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">checkStatements(statements)</td>
                     <td class="type-col">Input: List&lt;Stmt&gt;<br>Output: void</td>
-                    <td>Validates statements in source order:
-                        <ul style="margin-left: 20px; margin-top: 6px;">
+                    <td>
+                        Validates statements in source order:
+                        <ul style="margin-left: 20px; margin-top: 6px; margin-bottom: 6px;">
                             <li><code>LET</code>: Checks initializing expression first, asserts name is not already in <code>declared</code>, then records the variable.</li>
                             <li><code>ASSIGN</code>: Verifies target name is already in <code>declared</code>, then checks expression.</li>
                             <li><code>PRINT</code>: Validates expression variables.</li>
                             <li><code>IF</code> / <code>WHILE</code>: Checks condition and recursively checks nested body blocks.</li>
                         </ul>
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private void checkStatements(List&lt;parser.Stmt&gt; statements) {
+    if (statements == null) return;
+    for (parser.Stmt s : statements) {
+        switch (s.kind) {
+            case LET:
+                checkExpr(s.expr);
+                if (declared.contains(s.name)) {
+                    throw new RuntimeException("Semantic error: variable '" +
+                            s.name + "' is declared twice");
+                }
+                declared.add(s.name);
+                break;
+            case ASSIGN:
+                if (!declared.contains(s.name)) {
+                    throw new RuntimeException("Semantic error: variable '" +
+                            s.name + "' is not declared");
+                }
+                checkExpr(s.expr);
+                break;
+            case PRINT:
+                checkExpr(s.expr);
+                break;
+            case IF:
+                checkExpr(s.condition);
+                checkStatements(s.body);
+                checkStatements(s.elseBody);
+                break;
+            case WHILE:
+                checkExpr(s.condition);
+                checkStatements(s.body);
+                break;
+            default:
+                throw new IllegalStateException("Unknown statement kind");
+        }
+    }
+}</code></pre>
                     </td>
                 </tr>
                 <tr>
                     <td class="name-col">checkExpr(expr)</td>
                     <td class="type-col">Input: Expr<br>Output: void</td>
-                    <td>Recursively confirms all variable names (<code>NAME</code> nodes) exist in <code>declared</code>; recurses into <code>BINARY</code> left and right branches.</td>
+                    <td>
+                        Recursively confirms all variable names (<code>NAME</code> nodes) exist in <code>declared</code>; recurses into <code>BINARY</code> left and right branches.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private void checkExpr(parser.Expr expr) {
+    if (expr == null) return;
+    if (expr.kind == parser.ExprKind.NAME) {
+        if (!declared.contains(expr.value)) {
+            throw new RuntimeException("Semantic error: variable '" +
+                    expr.value + "' is not declared");
+        }
+    } else if (expr.kind == parser.ExprKind.BINARY) {
+        checkExpr(expr.left);
+        checkExpr(expr.right);
+    }
+}</code></pre>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -1265,31 +1562,98 @@ end</pre>
         <table class="func-table-wide">
             <thead>
                 <tr>
-                    <th style="width: 20%;">Function</th>
-                    <th style="width: 25%;">Input & Output</th>
-                    <th>Responsibility & Implementation Details</th>
+                    <th style="width: 18%;">Function</th>
+                    <th style="width: 22%;">Input & Output</th>
+                    <th>Responsibility & Code Backbone</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="name-col">indent(depth)</td>
                     <td class="type-col">Input: int depth<br>Output: String</td>
-                    <td>Generates a string with <code>depth * 4</code> spaces for clean, readable Java code indentation.</td>
+                    <td>
+                        Generates a string with <code>depth * 4</code> spaces for clean, readable Java code indentation.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private String indent(int depth) {
+    StringBuilder s = new StringBuilder();
+    for (int i = 0; i &lt; depth; i++) s.append("    ");
+    return s.toString();
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">expression(expr)</td>
                     <td class="type-col">Input: Expr<br>Output: String</td>
-                    <td>Converts an expression node to Java text, enclosing binary operations in parentheses <code>(left op right)</code> to preserve evaluation grouping.</td>
+                    <td>
+                        Converts an expression node to Java text, enclosing binary operations in parentheses <code>(left op right)</code> to preserve evaluation grouping.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private String expression(parser.Expr expr) {
+    if (expr.kind == parser.ExprKind.NUMBER || expr.kind == parser.ExprKind.NAME) {
+        return expr.value;
+    }
+    return "(" + expression(expr.left) + " " + expr.value + " " +
+            expression(expr.right) + ")";
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">statements(list, out, depth)</td>
                     <td class="type-col">Input: List&lt;Stmt&gt;, StringBuilder, int<br>Output: void</td>
-                    <td>Recursively translates AST statements into Java statements (<code>int name = expr;</code>, <code>if (...) { ... }</code>, <code>while (...) { ... }</code>).</td>
+                    <td>
+                        Recursively translates AST statements into Java statements (<code>int name = expr;</code>, <code>if (...) { ... }</code>, <code>while (...) { ... }</code>).
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>private void statements(List&lt;parser.Stmt&gt; list, StringBuilder out, int depth) {
+    for (parser.Stmt s : list) {
+        String pad = indent(depth);
+        switch (s.kind) {
+            case LET:
+                out.append(pad).append("int ").append(s.name).append(" = ")
+                        .append(expression(s.expr)).append(";\n");
+                break;
+            case ASSIGN:
+                out.append(pad).append(s.name).append(" = ")
+                        .append(expression(s.expr)).append(";\n");
+                break;
+            case PRINT:
+                out.append(pad).append("System.out.println(")
+                        .append(expression(s.expr)).append(");\n");
+                break;
+            case IF:
+                out.append(pad).append("if (").append(expression(s.condition)).append(") {\n");
+                statements(s.body, out, depth + 1);
+                if (!s.elseBody.isEmpty()) {
+                    out.append(pad).append("} else {\n");
+                    statements(s.elseBody, out, depth + 1);
+                }
+                out.append(pad).append("}\n");
+                break;
+            case WHILE:
+                out.append(pad).append("while (").append(expression(s.condition)).append(") {\n");
+                statements(s.body, out, depth + 1);
+                out.append(pad).append("}\n");
+                break;
+            default:
+                throw new IllegalStateException("Unknown statement kind");
+        }
+    }
+}</code></pre>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name-col">generate(program)</td>
                     <td class="type-col">Input: List&lt;Stmt&gt;<br>Output: String</td>
-                    <td>Wraps emitted statements in <code>class GeneratedProgram { public static void main(String[] args) { ... } }</code> and returns final Java source code.</td>
+                    <td>
+                        Wraps emitted statements in <code>class GeneratedProgram { public static void main(String[] args) { ... } }</code> and returns final Java source code.
+                        <div><span class="backbone-badge">&#9658; Backbone Implementation</span></div>
+                        <pre class="func-backbone"><code>public String generate(List&lt;parser.Stmt&gt; program) {
+    StringBuilder out = new StringBuilder();
+    out.append("class GeneratedProgram {\n")
+            .append("    public static void main(String[] args) {\n");
+    statements(program, out, 2);
+    out.append("    }\n}");
+    return out.toString();
+}</code></pre>
+                    </td>
                 </tr>
             </tbody>
         </table>
