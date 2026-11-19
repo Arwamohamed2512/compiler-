@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiniLang Compiler: Interactive Visualizer & Guide</title>
+    <title>MiniLang Compiler: Comprehensive Guide & Visualizer</title>
     <style>
         :root {
-            --bg-primary: #0f172a;
+            --bg-primary: #0b1120;
             --bg-secondary: #1e293b;
             --bg-tertiary: #334155;
             --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.25);
+            --accent-glow: rgba(56, 189, 248, 0.2);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border: #475569;
             --success: #4ade80;
-            --warning: #facc15;
+            --warning: #fbbf24;
             --danger: #f87171;
             --purple: #c084fc;
+            --pink: #f472b6;
             --font-code: 'Fira Code', 'Courier New', monospace;
         }
 
@@ -36,36 +37,64 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1240px;
             margin: 0 auto;
         }
 
         header {
             text-align: center;
-            padding: 40px 20px 30px;
+            padding: 50px 20px 30px;
             border-bottom: 1px solid var(--border);
             margin-bottom: 40px;
         }
 
         header h1 {
-            font-size: 2.8rem;
+            font-size: 3rem;
             background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 12px;
+            font-weight: 800;
         }
 
         header p {
             color: var(--text-muted);
-            font-size: 1.2rem;
-            max-width: 800px;
+            font-size: 1.25rem;
+            max-width: 850px;
             margin: 0 auto;
         }
 
-        /* Pipeline Overview */
+        /* Nav Quick Links */
+        .quick-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .quick-nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .quick-nav a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background-color: var(--bg-tertiary);
+        }
+
+        /* Pipeline Cards Overview */
         .pipeline-overview {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 16px;
             margin-bottom: 40px;
         }
@@ -73,18 +102,19 @@
         .pipeline-card {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 22px;
             text-align: center;
-            position: relative;
             transition: all 0.3s ease;
-            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
-        .pipeline-card:hover, .pipeline-card.active {
+        .pipeline-card:hover {
             border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-            transform: translateY(-3px);
+            box-shadow: 0 0 25px var(--accent-glow);
+            transform: translateY(-4px);
         }
 
         .pipeline-card .step-num {
@@ -95,12 +125,20 @@
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.85rem;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .pipeline-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 8px;
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+
+        .pipeline-card .file-badge {
+            font-family: var(--font-code);
+            color: var(--purple);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: block;
         }
 
         .pipeline-card p {
@@ -123,8 +161,9 @@
             align-items: center;
             gap: 12px;
             font-size: 1.8rem;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: var(--accent);
+            font-weight: 700;
         }
 
         .presets {
@@ -145,7 +184,7 @@
             background-color: var(--bg-tertiary);
             color: var(--text-main);
             border: 1px solid var(--border);
-            padding: 6px 14px;
+            padding: 7px 16px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.85rem;
@@ -166,16 +205,9 @@
             font-size: 1rem;
         }
 
-        .sim-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            margin-top: 15px;
-        }
-
         textarea#source-input {
             width: 100%;
-            height: 140px;
+            height: 130px;
             background-color: var(--bg-primary);
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -191,7 +223,6 @@
             border-color: var(--accent);
         }
 
-        /* Stepper Tabs */
         .stepper-nav {
             display: flex;
             gap: 10px;
@@ -226,11 +257,11 @@
             background-color: var(--bg-primary);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
+            padding: 22px;
             min-height: 250px;
         }
 
-        /* Visualization Renderers */
+        /* Token visualization */
         .tokens-display {
             display: flex;
             flex-wrap: wrap;
@@ -241,31 +272,31 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 6px 12px;
+            padding: 8px 14px;
             display: inline-flex;
             flex-direction: column;
-            gap: 2px;
-            animation: fadeIn 0.3s ease;
+            gap: 4px;
         }
 
         .token-pill .token-type {
             font-size: 0.7rem;
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
             color: var(--accent);
         }
 
         .token-pill .token-val {
             font-family: var(--font-code);
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: #fff;
         }
 
         .token-pill .token-loc {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
         }
 
+        /* AST Visual Tree */
         .ast-tree {
             font-family: var(--font-code);
             font-size: 0.95rem;
@@ -277,7 +308,7 @@
             margin-left: 20px;
             position: relative;
             padding-left: 14px;
-            border-left: 2px solid var(--bg-tertiary);
+            border-left: 2px solid var(--border);
         }
 
         .ast-kind {
@@ -289,6 +320,7 @@
             color: var(--warning);
         }
 
+        /* Symbol table */
         .symbol-table {
             width: 100%;
             border-collapse: collapse;
@@ -297,7 +329,7 @@
 
         .symbol-table th, .symbol-table td {
             border: 1px solid var(--border);
-            padding: 10px;
+            padding: 12px;
             text-align: left;
         }
 
@@ -317,23 +349,24 @@
         }
 
         pre.code-output {
-            background-color: #090d16;
+            background-color: #060911;
             color: #38bdf8;
-            padding: 16px;
+            padding: 18px;
             border-radius: 8px;
             font-family: var(--font-code);
             font-size: 0.95rem;
             overflow-x: auto;
-            line-height: 1.5;
+            line-height: 1.6;
+            border: 1px solid #1e293b;
         }
 
-        /* Documentation Stage Cards */
+        /* Detailed Documentation Cards */
         .stage-detail {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 40px;
+            padding: 35px;
+            margin-bottom: 45px;
         }
 
         .stage-header {
@@ -344,11 +377,11 @@
             gap: 15px;
             border-bottom: 1px solid var(--border);
             padding-bottom: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .stage-header h2 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: #fff;
         }
 
@@ -359,7 +392,7 @@
         }
 
         .badge {
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: bold;
@@ -377,23 +410,110 @@
             border: 1px solid var(--success);
         }
 
+        /* Visual Diagrams inside stages */
+        .visual-diagram-box {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 25px 0;
+        }
+
+        .visual-diagram-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .diagram-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .flow-node {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 18px;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .flow-node.highlight {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .flow-node .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .flow-node .val {
+            font-family: var(--font-code);
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .flow-arrow {
+            color: var(--accent);
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        /* Comparison columns */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comp-card {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .comp-card h4 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--bg-tertiary);
+            padding-bottom: 6px;
+        }
+
+        /* Function tables */
         .func-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .func-table th, .func-table td {
             border: 1px solid var(--border);
-            padding: 12px;
+            padding: 12px 14px;
             text-align: left;
         }
 
         .func-table th {
             background-color: var(--bg-tertiary);
             color: var(--text-main);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .func-table td {
@@ -414,16 +534,11 @@
 
         footer {
             text-align: center;
-            padding: 30px;
+            padding: 40px 20px;
             color: var(--text-muted);
             border-top: 1px solid var(--border);
-            margin-top: 40px;
-            font-size: 0.9rem;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            margin-top: 50px;
+            font-size: 0.95rem;
         }
     </style>
 </head>
@@ -432,100 +547,181 @@
     <div class="container">
 
         <header>
-            <h1>MiniLang Compiler Pipeline</h1>
-            <p>An interactive educational visualizer & architecture guide explaining Lexing, Parsing, Semantic Analysis, and Code Generation.</p>
+            <h1>MiniLang Compiler Architecture & Visualizer</h1>
+            <p>A complete educational guide explaining every phase of the compiler with input/output specifications, visual representations, code examples, and an interactive simulation engine.</p>
+            
+            <div class="quick-nav">
+                <a href="#simulator">&#9658; Live Simulator</a>
+                <a href="#stage-lexer">1. Lexer</a>
+                <a href="#stage-parser">2. Parser</a>
+                <a href="#stage-semantic">3. Semantic Analyzer</a>
+                <a href="#stage-codegen">4. Code Generator</a>
+            </div>
         </header>
 
-        <!-- Pipeline Cards Overview -->
+        <!-- Pipeline Overview Cards -->
         <div class="pipeline-overview">
-            <div class="pipeline-card active" onclick="showStageDoc('stage-lexer')">
-                <span class="step-num">Step 1</span>
+            <a href="#stage-lexer" class="pipeline-card">
+                <span class="step-num">Stage 1</span>
                 <h3>Lexer</h3>
-                <p>lexer.java</p>
-                <p>Scans raw text character-by-character into distinct tokens.</p>
-            </div>
-            <div class="pipeline-card" onclick="showStageDoc('stage-parser')">
-                <span class="step-num">Step 2</span>
+                <span class="file-badge">lexer.java</span>
+                <p>Scans raw characters, removes whitespace, and outputs typed Tokens.</p>
+            </a>
+            <a href="#stage-parser" class="pipeline-card">
+                <span class="step-num">Stage 2</span>
                 <h3>Parser</h3>
-                <p>parser.java</p>
-                <p>Verifies grammar & constructs Abstract Syntax Tree (AST).</p>
-            </div>
-            <div class="pipeline-card" onclick="showStageDoc('stage-semantic')">
-                <span class="step-num">Step 3</span>
+                <span class="file-badge">parser.java</span>
+                <p>Parses grammar and builds the Abstract Syntax Tree (AST).</p>
+            </a>
+            <a href="#stage-semantic" class="pipeline-card">
+                <span class="step-num">Stage 3</span>
                 <h3>Semantic Analyzer</h3>
-                <p>SemanticAnalyzer.java</p>
-                <p>Validates declarations, scope, and variable usages.</p>
-            </div>
-            <div class="pipeline-card" onclick="showStageDoc('stage-codegen')">
-                <span class="step-num">Step 4</span>
+                <span class="file-badge">SemanticAnalyzer.java</span>
+                <p>Checks declaration before use and rejects duplicate variable definitions.</p>
+            </a>
+            <a href="#stage-codegen" class="pipeline-card">
+                <span class="step-num">Stage 4</span>
                 <h3>Code Generator</h3>
-                <p>CodeGenerator.java</p>
-                <p>Translates AST into runnable Java code.</p>
-            </div>
+                <span class="file-badge">CodeGenerator.java</span>
+                <p>Translates AST nodes into formatted, runnable Java source code.</p>
+            </a>
         </div>
 
-        <!-- Interactive Visualizer -->
-        <section class="interactive-section">
+        <!-- ================= LIVE SIMULATOR ================= -->
+        <section class="interactive-section" id="simulator">
             <div class="section-title">
-                <span>Interactive Live Pipeline Visualizer</span>
+                <span>&#9881; Live Interactive Pipeline Simulator</span>
             </div>
             <p style="color: var(--text-muted); margin-bottom: 15px;">
-                Choose a sample MiniLang program or write your own, then switch between tabs to see the live transformation at each compiler stage.
+                Type or select any MiniLang program. The simulator runs client-side logic identical to the Java classes, displaying the exact output produced at each compilation phase.
             </p>
 
             <div class="presets">
-                <label>Presets:</label>
+                <label>Preset Programs:</label>
                 <button class="btn-preset" onclick="setPreset('basic')">1. Arithmetic</button>
-                <button class="btn-preset" onclick="setPreset('ifelse')">2. If-Else</button>
+                <button class="btn-preset" onclick="setPreset('ifelse')">2. If-Else Condition</button>
                 <button class="btn-preset" onclick="setPreset('loop')">3. While Loop</button>
-                <button class="btn-preset" onclick="setPreset('error_undeclared')">4. Error (Undeclared)</button>
-                <button class="btn-preset" onclick="setPreset('error_duplicate')">5. Error (Duplicate)</button>
+                <button class="btn-preset" onclick="setPreset('error_undeclared')">4. Error (Undeclared Var)</button>
+                <button class="btn-preset" onclick="setPreset('error_duplicate')">5. Error (Duplicate Var)</button>
             </div>
 
             <textarea id="source-input" spellcheck="false">let age = 20
 let score = age + 10
 print score</textarea>
 
-            <div style="margin-top: 12px; display: flex; gap: 10px;">
+            <div style="margin-top: 14px;">
                 <button class="btn-action primary" onclick="runPipeline()">Run Pipeline Simulation</button>
             </div>
 
             <div class="stepper-nav">
-                <button class="step-tab active" id="tab-btn-1" onclick="switchVisualizerTab(1)">1. Tokens (Lexer)</button>
-                <button class="step-tab" id="tab-btn-2" onclick="switchVisualizerTab(2)">2. AST (Parser)</button>
-                <button class="step-tab" id="tab-btn-3" onclick="switchVisualizerTab(3)">3. Scope (Semantic)</button>
-                <button class="step-tab" id="tab-btn-4" onclick="switchVisualizerTab(4)">4. Java Output (Codegen)</button>
+                <button class="step-tab active" id="tab-btn-1" onclick="switchVisualizerTab(1)">1. Tokens (Lexer Output)</button>
+                <button class="step-tab" id="tab-btn-2" onclick="switchVisualizerTab(2)">2. AST (Parser Output)</button>
+                <button class="step-tab" id="tab-btn-3" onclick="switchVisualizerTab(3)">3. Scope (Semantic Output)</button>
+                <button class="step-tab" id="tab-btn-4" onclick="switchVisualizerTab(4)">4. Java Source (Codegen Output)</button>
             </div>
 
             <div class="sim-output-box" id="sim-display">
-                <!-- Dynamically populated -->
+                <!-- Dynamically updated -->
             </div>
         </section>
 
-        <!-- Detailed Documentation Stages -->
-
-        <!-- STAGE 1: LEXER -->
+        <!-- ================= STAGE 1: LEXER ================= -->
         <section class="stage-detail" id="stage-lexer">
             <div class="stage-header">
                 <div>
-                    <h2>1. Lexical Analysis (lexer.java)</h2>
-                    <p style="color: var(--text-muted);">Converts source character stream into language tokens.</p>
+                    <h2>Stage 1: Lexical Analysis (Scanner / Tokenizer)</h2>
+                    <span class="file-badge">Implemented in: lexer.java</span>
                 </div>
                 <div class="stage-badges">
                     <span class="badge input">Input: String source</span>
                     <span class="badge output">Output: List&lt;Token&gt;</span>
                 </div>
             </div>
+
             <p>
-                The <strong>Lexer</strong> (Scanner) reads the source text character by character. It strips whitespace and newlines, identifies keywords (<code>let</code>, <code>print</code>, <code>if</code>, <code>else</code>, <code>while</code>, <code>end</code>), integer numbers, identifiers (<code>Var</code>), and operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>=</code>). Each token records its exact <code>line</code> and <code>column</code>.
+                The <strong>Lexer</strong> is the compiler's front door. It reads the source code character by character, tracks line and column numbers, strips non-semantic whitespace and carriage returns, and converts groups of characters into discrete, categorized <code>Token</code> objects.
             </p>
+
+            <!-- Visual Diagram -->
+            <div class="visual-diagram-box">
+                <div class="visual-diagram-title">&#128065; Visualizing Token Scanning</div>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 12px;">
+                    How the characters in <code>"let age = 20"</code> are scanned and grouped into typed token pills:
+                </p>
+                <div class="diagram-flow">
+                    <div class="flow-node">
+                        <div class="label">Chars: 0..2</div>
+                        <div class="val">"let"</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <div class="label">Token 1</div>
+                        <div class="val" style="color:var(--accent)">LET("let") @ 1:1</div>
+                    </div>
+                </div>
+                <div class="diagram-flow">
+                    <div class="flow-node">
+                        <div class="label">Chars: 4..6</div>
+                        <div class="val">"age"</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <div class="label">Token 2</div>
+                        <div class="val" style="color:var(--accent)">Var("age") @ 1:5</div>
+                    </div>
+                </div>
+                <div class="diagram-flow">
+                    <div class="flow-node">
+                        <div class="label">Char: 8</div>
+                        <div class="val">"="</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <div class="label">Token 3</div>
+                        <div class="val" style="color:var(--accent)">EQUALS("=") @ 1:9</div>
+                    </div>
+                </div>
+                <div class="diagram-flow">
+                    <div class="flow-node">
+                        <div class="label">Chars: 10..11</div>
+                        <div class="val">"20"</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <div class="label">Token 4</div>
+                        <div class="val" style="color:var(--accent)">Number("20") @ 1:11</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Box -->
+            <div class="comparison-grid">
+                <div class="comp-card">
+                    <h4>Example Input (Source Text)</h4>
+                    <pre class="code-output">let age = 20
+print age</pre>
+                </div>
+                <div class="comp-card">
+                    <h4>Example Output (Token List)</h4>
+                    <pre class="code-output">let(let)@1:1
+Var(age)@1:5
+EQUALS(=)@1:9
+Number(20)@1:11
+NEWLINE(\n)@1:13
+print(print)@2:1
+Var(age)@2:7
+EOF()@3:1</pre>
+                </div>
+            </div>
+
+            <!-- Functions Table -->
             <table class="func-table">
                 <thead>
                     <tr>
                         <th>Function</th>
                         <th>Input</th>
                         <th>Output</th>
-                        <th>Description</th>
+                        <th>What It Does</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -533,64 +729,102 @@ print score</textarea>
                         <td class="func-name">current()</td>
                         <td>None</td>
                         <td class="type-tag">char</td>
-                        <td>Returns the character at <code>pos</code>, or <code>'\0'</code> if EOF is reached.</td>
+                        <td>Returns the character at the current index (<code>pos</code>) or <code>'\0'</code> at EOF.</td>
                     </tr>
                     <tr>
                         <td class="func-name">peek()</td>
                         <td>None</td>
                         <td class="type-tag">char</td>
-                        <td>Looks at <code>pos + 1</code> without advancing the scanner position.</td>
+                        <td>Looks ahead at index <code>pos + 1</code> without consuming the character.</td>
                     </tr>
                     <tr>
                         <td class="func-name">advance()</td>
                         <td>None</td>
                         <td class="type-tag">void</td>
-                        <td>Moves forward one character, updating <code>line</code> and <code>column</code> tracking.</td>
+                        <td>Consumes the current character. Increments <code>line</code> on <code>'\n'</code> and updates <code>column</code>.</td>
                     </tr>
                     <tr>
                         <td class="func-name">add(type, text, atLine, atCol)</td>
                         <td class="type-tag">TokenType, String, int, int</td>
                         <td class="type-tag">void</td>
-                        <td>Constructs a new <code>Token</code> instance and appends it to <code>tokens</code>.</td>
+                        <td>Creates a new <code>Token</code> instance with source location and appends it to <code>tokens</code>.</td>
                     </tr>
                     <tr>
-                        <td class="func-name">error(message, atLine, atCol)</td>
+                        <td class="func-name">error(msg, atLine, atCol)</td>
                         <td class="type-tag">String, int, int</td>
                         <td class="type-tag">void (throws)</td>
-                        <td>Throws a <code>RuntimeException</code> detailing the illegal character and line/column.</td>
+                        <td>Throws a descriptive <code>RuntimeException</code> pinpointing the exact line and column of an illegal character.</td>
                     </tr>
                     <tr>
                         <td class="func-name">scan()</td>
                         <td>None</td>
                         <td class="type-tag">List&lt;Token&gt;</td>
-                        <td>The main loop scanning all tokens, appending <code>EOF</code>, and returning the token list.</td>
+                        <td>The main loop scanning all tokens in the source until reaching <code>'\0'</code>, appends <code>EOF</code>, and returns the list.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <!-- STAGE 2: PARSER -->
+        <!-- ================= STAGE 2: PARSER ================= -->
         <section class="stage-detail" id="stage-parser">
             <div class="stage-header">
                 <div>
-                    <h2>2. Syntax Analysis (parser.java)</h2>
-                    <p style="color: var(--text-muted);">Constructs the Abstract Syntax Tree (AST) using recursive descent.</p>
+                    <h2>Stage 2: Syntax Analysis (Recursive Descent Parser)</h2>
+                    <span class="file-badge">Implemented in: parser.java</span>
                 </div>
                 <div class="stage-badges">
                     <span class="badge input">Input: List&lt;Token&gt;</span>
                     <span class="badge output">Output: List&lt;Stmt&gt; (AST)</span>
                 </div>
             </div>
+
             <p>
-                The <strong>Parser</strong> transforms the linear token stream into a hierarchical Abstract Syntax Tree. It enforces precedence: <code>*</code> and <code>/</code> (Terms) bind tighter than <code>+</code> and <code>-</code> (Expressions), and supports structured statements with block nesting.
+                The <strong>Parser</strong> enforces the grammar of the programming language. It transforms the flat stream of tokens into a hierarchical <strong>Abstract Syntax Tree (AST)</strong>. It encodes mathematical precedence (multiplication and division bind tighter than addition and subtraction) and models compound structures like conditional blocks and while loops.
             </p>
+
+            <!-- Visual Diagram -->
+            <div class="visual-diagram-box">
+                <div class="visual-diagram-title">&#127795; Visualizing Abstract Syntax Tree (AST) Hierarchy</div>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 12px;">
+                    For the statement <code>let score = age + 10 * 2</code>, the tree guarantees <code>10 * 2</code> is evaluated before <code>+</code>:
+                </p>
+                <div style="font-family: var(--font-code); font-size: 0.95rem; line-height: 1.8; color: #cbd5e1; background: #060911; padding: 18px; border-radius: 8px;">
+                    <div>[Stmt.LET] name = <span style="color:var(--warning)">"score"</span></div>
+                    <div style="margin-left: 20px;">└── expr: [Expr.BINARY] op = <span style="color:var(--accent)">"+"</span></div>
+                    <div style="margin-left: 45px;">├── left: [Expr.NAME] value = <span style="color:var(--warning)">"age"</span></div>
+                    <div style="margin-left: 45px;">└── right: [Expr.BINARY] op = <span style="color:var(--accent)">"*"</span> (higher precedence)</div>
+                    <div style="margin-left: 80px;">├── left: [Expr.NUMBER] value = <span style="color:var(--warning)">"10"</span></div>
+                    <div style="margin-left: 80px;">└── right: [Expr.NUMBER] value = <span style="color:var(--warning)">"2"</span></div>
+                </div>
+            </div>
+
+            <!-- Example Box -->
+            <div class="comparison-grid">
+                <div class="comp-card">
+                    <h4>Example Tokens Input</h4>
+                    <pre class="code-output">let score = age + 10</pre>
+                </div>
+                <div class="comp-card">
+                    <h4>Parsed AST Node</h4>
+                    <pre class="code-output">Stmt.LET(
+  name: "score",
+  expr: Expr.BINARY(
+    op: "+",
+    left: Expr.NAME("age"),
+    right: Expr.NUMBER("10")
+  )
+)</pre>
+                </div>
+            </div>
+
+            <!-- Functions Table -->
             <table class="func-table">
                 <thead>
                     <tr>
                         <th>Function</th>
                         <th>Input</th>
                         <th>Output</th>
-                        <th>Description</th>
+                        <th>What It Does</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -598,72 +832,120 @@ print score</textarea>
                         <td class="func-name">parseProgram()</td>
                         <td>None</td>
                         <td class="type-tag">List&lt;Stmt&gt;</td>
-                        <td>Top-level entry point; loops through statements until <code>EOF</code>.</td>
+                        <td>Top-level routine. Skips newlines and parses statements until reaching the <code>EOF</code> token.</td>
                     </tr>
                     <tr>
                         <td class="func-name">parseStatement()</td>
                         <td>None</td>
                         <td class="type-tag">Stmt</td>
-                        <td>Dispatches parsing of <code>let</code>, <code>print</code>, <code>if</code>, <code>while</code>, or <code>Var = expr</code>.</td>
+                        <td>Dispatches parsing based on current token: <code>LET</code>, <code>PRINT</code>, <code>IF</code>, <code>WHILE</code>, or <code>ASSIGN</code>.</td>
                     </tr>
                     <tr>
                         <td class="func-name">parseBlock(stopAtElse)</td>
                         <td class="type-tag">boolean</td>
                         <td class="type-tag">List&lt;Stmt&gt;</td>
-                        <td>Parses block statements inside <code>if</code>/<code>while</code> until <code>end</code> or <code>else</code>.</td>
+                        <td>Parses a sequence of statements inside block bodies until reaching <code>end</code>, <code>else</code>, or <code>EOF</code>.</td>
                     </tr>
                     <tr>
                         <td class="func-name">parseCondition()</td>
                         <td>None</td>
                         <td class="type-tag">Expr</td>
-                        <td>Parses conditions of the form <code>left = right</code>.</td>
+                        <td>Parses conditional expressions: parses left expression, matches optional <code>=</code>, and parses right expression.</td>
                     </tr>
                     <tr>
                         <td class="func-name">parseExpression()</td>
                         <td>None</td>
                         <td class="type-tag">Expr</td>
-                        <td>Parses left-associative addition and subtraction: <code>term (+/- term)*</code>.</td>
+                        <td>Handles addition (<code>+</code>) and subtraction (<code>-</code>) with left-associative tree construction.</td>
                     </tr>
                     <tr>
                         <td class="func-name">parseTerm()</td>
                         <td>None</td>
                         <td class="type-tag">Expr</td>
-                        <td>Parses left-associative multiplication and division: <code>factor (*// factor)*</code>.</td>
+                        <td>Handles multiplication (<code>*</code>) and division (<code>/</code>), binding tighter than addition.</td>
                     </tr>
                     <tr>
                         <td class="func-name">parseFactor()</td>
                         <td>None</td>
                         <td class="type-tag">Expr</td>
-                        <td>Consumes primary values: either numeric literals or variable names.</td>
+                        <td>Parses primary atoms: integer literal (<code>NUMBER</code>) or variable identifier (<code>NAME</code>).</td>
+                    </tr>
+                    <tr>
+                        <td class="func-name">consume(type, msg)</td>
+                        <td class="type-tag">TokenType, String</td>
+                        <td class="type-tag">Token</td>
+                        <td>Verifies that the current token matches <code>type</code> and consumes it; otherwise throws a parse error.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <!-- STAGE 3: SEMANTIC ANALYZER -->
+        <!-- ================= STAGE 3: SEMANTIC ANALYZER ================= -->
         <section class="stage-detail" id="stage-semantic">
             <div class="stage-header">
                 <div>
-                    <h2>3. Semantic Analysis (SemanticAnalyzer.java)</h2>
-                    <p style="color: var(--text-muted);">Enforces scope rules and variable declaration constraints.</p>
+                    <h2>Stage 3: Semantic Analysis</h2>
+                    <span class="file-badge">Implemented in: SemanticAnalyzer.java</span>
                 </div>
                 <div class="stage-badges">
                     <span class="badge input">Input: List&lt;Stmt&gt; (AST)</span>
-                    <span class="badge output">Output: Valid / Exception</span>
+                    <span class="badge output">Output: Valid / Semantic Error</span>
                 </div>
             </div>
+
             <p>
-                The <strong>Semantic Analyzer</strong> ensures that:
-                1. Every variable is declared with <code>let</code> before it is used in any expression or assignment.
-                2. Variables cannot be declared more than once (duplicate declarations are rejected).
+                The <strong>Semantic Analyzer</strong> validates constraints that cannot be checked by syntax grammar alone. It maintains a <strong>Symbol Table</strong> (a set of declared names) to enforce two core rules:
+                <br>1. <strong>Use-Before-Declaration</strong>: Every variable used in expressions or assignments must be declared with <code>let</code> first.
+                <br>2. <strong>No Duplicate Declarations</strong>: Declaring the same variable name more than once is an error.
             </p>
+
+            <!-- Visual Diagram -->
+            <div class="visual-diagram-box">
+                <div class="visual-diagram-title">&#128221; Visualizing Symbol Table State Evolution</div>
+                <div class="diagram-flow">
+                    <div class="flow-node">
+                        <div class="label">Step 1: let age = 20</div>
+                        <div class="val" style="color:var(--success)">declared: { "age" }</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node">
+                        <div class="label">Step 2: let score = age + 10</div>
+                        <div class="val" style="color:var(--success)">declared: { "age", "score" }</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <div class="label">Step 3: print total</div>
+                        <div class="val" style="color:var(--danger)">Error: 'total' not declared!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Box -->
+            <div class="comparison-grid">
+                <div class="comp-card">
+                    <h4>Valid Program</h4>
+                    <pre class="code-output">let a = 10
+let b = a + 5
+print b
+// Result: PASSED &#10004;</pre>
+                </div>
+                <div class="comp-card">
+                    <h4>Invalid Program (Semantic Error)</h4>
+                    <pre class="code-output">print total
+// Result: FAILED &#10008;
+// RuntimeException:
+// "Semantic error: variable 'total' is not declared"</pre>
+                </div>
+            </div>
+
+            <!-- Functions Table -->
             <table class="func-table">
                 <thead>
                     <tr>
                         <th>Function</th>
                         <th>Input</th>
                         <th>Output</th>
-                        <th>Description</th>
+                        <th>What It Does</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -671,46 +953,113 @@ print score</textarea>
                         <td class="func-name">analyze(program)</td>
                         <td class="type-tag">List&lt;Stmt&gt;</td>
                         <td class="type-tag">void</td>
-                        <td>Clears the <code>declared</code> symbol set, then verifies the program sequentially.</td>
+                        <td>Clears the <code>declared</code> set and initiates sequential checking of the full program.</td>
                     </tr>
                     <tr>
                         <td class="func-name">checkStatements(statements)</td>
                         <td class="type-tag">List&lt;Stmt&gt;</td>
                         <td class="type-tag">void</td>
-                        <td>Traverses statements, verifying declarations on <code>LET</code>, assignments, print calls, and loop/if bodies.</td>
+                        <td>Traverses each statement in order:
+                            <ul>
+                                <li><code>LET</code>: Checks initializing expression, rejects if already in <code>declared</code>, then adds name to <code>declared</code>.</li>
+                                <li><code>ASSIGN</code>: Confirms name is in <code>declared</code>, then checks expression.</li>
+                                <li><code>PRINT</code>: Validates expression.</li>
+                                <li><code>IF</code> / <code>WHILE</code>: Checks condition and recursively checks nested statement bodies.</li>
+                            </ul>
+                        </td>
                     </tr>
                     <tr>
                         <td class="func-name">checkExpr(expr)</td>
                         <td class="type-tag">Expr</td>
                         <td class="type-tag">void</td>
-                        <td>Recurses into binary expressions; asserts all <code>NAME</code> variables exist in <code>declared</code>.</td>
+                        <td>Recursively verifies that every <code>NAME</code> identifier node exists in <code>declared</code>; recurses on <code>BINARY</code> left and right operands.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
-        <!-- STAGE 4: CODE GENERATOR -->
+        <!-- ================= STAGE 4: CODE GENERATOR ================= -->
         <section class="stage-detail" id="stage-codegen">
             <div class="stage-header">
                 <div>
-                    <h2>4. Code Generation (CodeGenerator.java)</h2>
-                    <p style="color: var(--text-muted);">Emits runnable target Java code from the validated AST.</p>
+                    <h2>Stage 4: Code Generation</h2>
+                    <span class="file-badge">Implemented in: CodeGenerator.java</span>
                 </div>
                 <div class="stage-badges">
-                    <span class="badge input">Input: List&lt;Stmt&gt; (AST)</span>
-                    <span class="badge output">Output: String (Java Code)</span>
+                    <span class="badge input">Input: Validated AST</span>
+                    <span class="badge output">Output: Complete Java Source Code</span>
                 </div>
             </div>
+
             <p>
-                The <strong>Code Generator</strong> translates MiniLang AST nodes into Java source code, generating appropriate variable typing (<code>int</code>), statements, indentation, and wrapping them in <code>class GeneratedProgram { public static void main(String[] args) { ... } }</code>.
+                The <strong>Code Generator</strong> is the synthesis backend of the compiler. It walks through the validated Abstract Syntax Tree and emits target code. In this project, it compiles MiniLang into complete, idiomatic <strong>Java code</strong>, wrapping the statements inside <code>class GeneratedProgram { public static void main(String[] args) { ... } }</code> with accurate 4-space block indentation.
             </p>
+
+            <!-- Visual Diagram -->
+            <div class="visual-diagram-box">
+                <div class="visual-diagram-title">&#9889; Visualizing Translation from MiniLang to Java</div>
+                <div class="diagram-flow">
+                    <div class="flow-node">
+                        <div class="label">MiniLang</div>
+                        <div class="val" style="color:var(--purple)">let x = 10</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node">
+                        <div class="label">AST Node</div>
+                        <div class="val" style="color:var(--warning)">Stmt.LET("x", 10)</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <div class="label">Java Output</div>
+                        <div class="val" style="color:var(--accent)">int x = 10;</div>
+                    </div>
+                </div>
+                <div class="diagram-flow">
+                    <div class="flow-node">
+                        <div class="label">MiniLang</div>
+                        <div class="val" style="color:var(--purple)">print x + 5</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node">
+                        <div class="label">AST Node</div>
+                        <div class="val" style="color:var(--warning)">Stmt.PRINT(BINARY(+))</div>
+                    </div>
+                    <span class="flow-arrow">&rarr;</span>
+                    <div class="flow-node highlight">
+                        <div class="label">Java Output</div>
+                        <div class="val" style="color:var(--accent)">System.out.println((x + 5));</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Box -->
+            <div class="comparison-grid">
+                <div class="comp-card">
+                    <h4>Source MiniLang Program</h4>
+                    <pre class="code-output">let age = 20
+let score = age + 10
+print score</pre>
+                </div>
+                <div class="comp-card">
+                    <h4>Generated Java Program</h4>
+                    <pre class="code-output">class GeneratedProgram {
+    public static void main(String[] args) {
+        int age = 20;
+        int score = (age + 10);
+        System.out.println(score);
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Functions Table -->
             <table class="func-table">
                 <thead>
                     <tr>
                         <th>Function</th>
                         <th>Input</th>
                         <th>Output</th>
-                        <th>Description</th>
+                        <th>What It Does</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -718,36 +1067,37 @@ print score</textarea>
                         <td class="func-name">indent(depth)</td>
                         <td class="type-tag">int depth</td>
                         <td class="type-tag">String</td>
-                        <td>Returns 4 spaces per nesting depth level for readable indentation.</td>
+                        <td>Returns a string containing <code>depth * 4</code> spaces to format blocks with standard indentation.</td>
                     </tr>
                     <tr>
                         <td class="func-name">expression(expr)</td>
                         <td class="type-tag">Expr</td>
                         <td class="type-tag">String</td>
-                        <td>Converts an expression AST to Java string, parenthesizing binary operations.</td>
+                        <td>Translates expression nodes to Java syntax. Encloses binary operations in parentheses <code>(left op right)</code> to preserve grouping.</td>
                     </tr>
                     <tr>
                         <td class="func-name">statements(list, out, depth)</td>
                         <td class="type-tag">List&lt;Stmt&gt;, StringBuilder, int</td>
                         <td class="type-tag">void</td>
-                        <td>Emits Java code for statements with proper indentation and block braces.</td>
+                        <td>Recursively emits Java statements with appropriate indentation, braces <code>{ ... }</code>, and semicolons.</td>
                     </tr>
                     <tr>
                         <td class="func-name">generate(program)</td>
                         <td class="type-tag">List&lt;Stmt&gt;</td>
                         <td class="type-tag">String</td>
-                        <td>Wraps emitted statements in a class and main method; returns final Java source code.</td>
+                        <td>Creates the outer <code>class GeneratedProgram</code> wrapper and <code>main</code> method, invokes <code>statements</code> at depth 2, and returns the Java source string.</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
         <footer>
-            MiniLang Compiler Pipeline &bull; Created for Compiler Design Workshop
+            MiniLang Educational Compiler &bull; Lexer &bull; Parser &bull; Semantic Analyzer &bull; Code Generator
         </footer>
+
     </div>
 
-    <!-- Interactive Simulation Script -->
+    <!-- Client-side Interactive Simulation Script -->
     <script>
         const PRESETS = {
             basic: `let age = 20\nlet score = age + 10\nprint score`,
@@ -770,21 +1120,12 @@ print score</textarea>
             runPipeline();
         }
 
-        function showStageDoc(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Client-side simulation of the compiler pipeline
         function runPipeline() {
             const src = document.getElementById('source-input').value;
             try {
-                // 1. Lexer
                 pipelineData.tokens = simulateLexer(src);
-                // 2. Parser
                 pipelineData.ast = simulateParser(pipelineData.tokens);
-                // 3. Semantic
                 pipelineData.semanticResult = simulateSemantic(pipelineData.ast);
-                // 4. Codegen
                 pipelineData.javaCode = simulateCodegen(pipelineData.ast);
             } catch (err) {
                 console.error(err);
@@ -807,7 +1148,7 @@ print score</textarea>
             display.innerHTML = '';
 
             if (currentTab === 1) {
-                // Tokens
+                // Lexer Tokens
                 if (!pipelineData.tokens.length) {
                     display.innerHTML = '<p style="color:var(--text-muted)">No tokens generated.</p>';
                     return;
@@ -820,21 +1161,21 @@ print score</textarea>
                     pill.innerHTML = `
                         <span class="token-type">${t.type}</span>
                         <span class="token-val">${escapeHtml(t.text === '\n' ? '\\n' : t.text)}</span>
-                        <span class="token-loc">L${t.line}:C${t.col}</span>
+                        <span class="token-loc">Line ${t.line}, Col ${t.col}</span>
                     `;
                     container.appendChild(pill);
                 });
                 display.appendChild(container);
 
             } else if (currentTab === 2) {
-                // AST
+                // Parser AST
                 if (pipelineData.ast.error) {
                     display.innerHTML = `<p class="badge-error">Parse Error: ${escapeHtml(pipelineData.ast.error)}</p>`;
                     return;
                 }
                 const astBox = document.createElement('div');
                 astBox.className = 'ast-tree';
-                astBox.innerHTML = '<div style="color:var(--accent); font-weight:bold; margin-bottom:8px;">Program AST:</div>' +
+                astBox.innerHTML = '<div style="color:var(--accent); font-weight:bold; margin-bottom:12px;">Abstract Syntax Tree (Program AST):</div>' +
                     renderAstStatements(pipelineData.ast);
                 display.appendChild(astBox);
 
@@ -843,7 +1184,7 @@ print score</textarea>
                 const sem = pipelineData.semanticResult;
                 let html = '';
                 if (sem.ok) {
-                    html += `<div style="margin-bottom:15px;" class="badge-valid">&#10004; Semantic Checks Passed: All variables declared before use, no duplicates.</div>`;
+                    html += `<div style="margin-bottom:15px;" class="badge-valid">&#10004; Semantic Checks Passed: All variables declared before use, and no duplicates exist.</div>`;
                 } else {
                     html += `<div style="margin-bottom:15px;" class="badge-error">&#10008; ${escapeHtml(sem.message)}</div>`;
                 }
@@ -854,13 +1195,13 @@ print score</textarea>
                         html += `<tr><td><code>${escapeHtml(v)}</code></td><td class="badge-valid">Declared in Scope</td></tr>`;
                     });
                 } else {
-                    html += `<tr><td colspan="2" style="color:var(--text-muted);">No declared variables.</td></tr>`;
+                    html += `<tr><td colspan="2" style="color:var(--text-muted);">No variables declared in symbol table.</td></tr>`;
                 }
                 html += `</tbody></table>`;
                 display.innerHTML = html;
 
             } else if (currentTab === 4) {
-                // Code Generator
+                // Codegen
                 if (!pipelineData.semanticResult.ok) {
                     display.innerHTML = `<p class="badge-error">Cannot generate code: Semantic error present.</p>`;
                     return;
@@ -869,7 +1210,7 @@ print score</textarea>
             }
         }
 
-        // Mini Lexer Simulator
+        // Simulators
         function simulateLexer(src) {
             let tokens = [];
             let line = 1, col = 1, pos = 0;
@@ -913,7 +1254,6 @@ print score</textarea>
             return tokens;
         }
 
-        // Mini Parser Simulator
         function simulateParser(tokens) {
             let p = 0;
             let current = () => tokens[p] || { type: 'EOF', text: '' };
@@ -1017,7 +1357,6 @@ print score</textarea>
             }
         }
 
-        // Mini Semantic Simulator
         function simulateSemantic(ast) {
             if (ast.error) return { ok: false, message: ast.error, declared: [] };
             let declared = new Set();
@@ -1072,7 +1411,6 @@ print score</textarea>
             };
         }
 
-        // Mini Codegen Simulator
         function simulateCodegen(ast) {
             let out = [];
             out.push("class GeneratedProgram {");
@@ -1146,7 +1484,6 @@ print score</textarea>
             return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // Run initially on load
         window.onload = runPipeline;
     </script>
 </body>
